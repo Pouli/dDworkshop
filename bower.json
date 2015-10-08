@@ -1,0 +1,19 @@
+{
+  "name": "dDayWorkshop",
+  "version": "0.0.0",
+  "authors": [
+    "Pouli"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#1.1.0"
+  }
+}

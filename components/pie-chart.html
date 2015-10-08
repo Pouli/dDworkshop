@@ -1,0 +1,94 @@
+<link rel="import" href="../lib/polymer/polymer.html">
+
+<dom-module id="pie-chart-element">
+  <style>
+    :host {
+      font-family: 'Lato', sans-serif;
+    }
+  </style>
+  <template>
+    <!-- Here add an svg element with an id tag="svg" -->
+    <svg id="svg"></svg>
+  </template>
+  <script>
+    Polymer({
+      is: "pie-chart-element", /* Register a new element called pie-chart-element */
+      properties: {
+        // Here add these properties:
+        // > width (Number + default value)
+        // > height (Number + default value)
+        // > radius (Number 'computeRadius(width, height)')
+        // > url (String + '')
+        // > data: (Array + [])
+        //
+        // exemple:
+        // property-name: {
+        //   type: type-name,
+        //   value: default value  OR  computed: 'computeRadius(width, height)'
+        // },
+        // ...
+        //
+      },
+      computeRadius: function(width, height) {
+        return Math.min(width, height) / 2;
+      },
+      // The createElements callback set the d3 elements we need to render the pie/donut chart
+      createElements: function() {
+        this.svg = d3.select(this.$.svg)
+            .attr('width', this.width)
+            .attr('height', this.height)
+          .append('g')
+            .attr('transform', 'translate(' + this.width/2 + ',' + this.height/2 + ')');
+
+        this.arc = d3.svg.arc()
+            .innerRadius(
+              // Here put:
+              // 0 if you want a plain pie chart
+              // OR
+              // this.radius - 5 - (this.radius * 0.3) if you want a donut chart
+            )
+            .outerRadius(this.radius - 5);
+
+        this.pie = d3.layout.pie()
+            .sort(null)
+            .value(function(d) { return d.population; });
+
+        this.color = d3.scale.ordinal()
+            .range([
+              // Here put the list of 7 color (#HEX) you want to render on your pie chart
+              // If you don't have any idea, check this cool website ;) : http://www.materialui.co/colors
+            ]);
+      },
+      // The draw callback render the pie/donut chart inside the DOM
+      draw: function() {
+        this.g = this.svg.selectAll('.arc')
+            .data(this.pie(this.data))
+          .enter().append('g')
+            .attr('class', 'arc');
+
+        this.g.append('path')
+            .attr('d', this.arc)
+            .style('fill', function(d) { return this.color(d.data.age); }/*Here bind the this keyword*/);
+            // If tou have a problem check this webpage: https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Function/bind
+
+        this.g.append('text')
+            .attr("transform", function(d) { return "translate(" + this.arc.centroid(d) + ")"; }/*Here bind the this keyword*/)
+            // If tou have a problem check this webpage: https://developer.mozilla.org/fr/docs/Web/JavaScript/Reference/Objets_globaux/Function/bind
+            .attr("dy", ".35em")
+            .style("text-anchor", "middle")
+            .text(function(d) { return d.data.age; });
+      },
+      // The getData callback retrieve data and call the draw callback
+      getData: function() {
+        d3.json(this.url, function(error, data) {
+          // Here assign data to the data variable
+          // Here call the draw callback
+        }.bind(this));
+      },
+      ready: function() {
+        // Here call the createElements callback
+        // Here call the getData callback
+      }
+    });
+  </script>
+</dom-module>
